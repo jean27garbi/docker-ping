@@ -7,13 +7,10 @@ FROM golang:1.17-buster AS build
 
 WORKDIR /app
 
-COPY go.mod ./
-COPY go.sum ./
+COPY . .
 RUN go mod download
 
-COPY *.go ./
-
-RUN go build -o /docker-ping
+RUN go build -o /docker-ping-roach /app/cmd/main.go
 
 ##
 ## Deploy
@@ -22,10 +19,10 @@ FROM gcr.io/distroless/base-debian10
 
 WORKDIR /
 
-COPY --from=build /docker-ping /docker-ping
+COPY --from=build /docker-ping-roach /docker-ping-roach
 
 EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["/docker-ping"]
+ENTRYPOINT ["/docker-ping-roach"]

@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  docker-ping-roach:
+    depends_on: 
+      - roach
+    build:
+      context: .
+    container_name: rest-server
+    hostname: rest-server
+    networks:
+      - mynet
+    ports:
+      - 81:8080
+    env_file:
+      - .env
+    deploy:
+      restart_policy:
+        condition: on-failure
+  roach:
+    image: cockroachdb/cockroach:latest-v20.1
+    container_name: roach
+    hostname: db
+    networks:
+      - mynet
+    ports:
+      - 26257:26257
+      - 8080:8080
+    volumes:
+      - roach:/cockroach/cockroach-data
+    command: start-single-node --insecure
+
+volumes:
+  roach:
+
+networks:
+  mynet:
+    driver: bridge
